@@ -1,4 +1,12 @@
-import $ from 'jquery';
+import $ from 'jquery'; // carrega o sistema de modulos
+
+const loadHtmlSuccessCallbacks = []
+
+export function onLoadHtmlSuccess(callback) {
+    if(!loadHtmlSuccessCallbacks.includes(callback)){
+        loadHtmlSuccessCallbacks.push(callback)
+    }
+}
 
 function loadIncludes(parent){
     if(!parent) parent = 'body'
@@ -6,14 +14,17 @@ function loadIncludes(parent){
         const url = $(e).attr('wm-include')
         $.ajax({
             url,
-            success(data){
+            success(data){ // function callback 
                 $(e).html(data)
                 $(e).removeAttr('wm-include')
                 
-                loadIncludes()
+                loadHtmlSuccessCallbacks.forEach(callback => callback(data))
+                loadIncludes(e)
             }    
         })
     })
 }
 
 loadIncludes()
+
+
